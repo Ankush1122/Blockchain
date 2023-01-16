@@ -1,15 +1,14 @@
 #include "include/BlockChain.h"
 #include "include/Transaction.h"
 
-BlockChain::BlockChain()
+BlockChain::BlockChain(const std::vector<Transaction> &genesisTr)
 {
-	Block genesisBlock = getGenesisBlock();
+	Block genesisBlock = getGenesisBlock(genesisTr);
 	chain.push_back(genesisBlock);
 }
 
-Block BlockChain::getGenesisBlock()
+Block BlockChain::getGenesisBlock(const std::vector<Transaction> &genesisTr)
 {
-	std::vector<Transaction> genesisTr;
 	Block genesisBlock(0, genesisTr, 0, 0);
 	return genesisBlock;
 }
@@ -17,14 +16,14 @@ Block BlockChain::getGenesisBlock()
 void BlockChain::mineBlock(const std::vector<Transaction> &transactionVector)
 {
 	uint8_t currentIndex = chain.size();
-	uint8_t difficulty = currentIndex; //difficulty = currentIndex for simplicity
-	std::string previousHash = chain[currentIndex - 1].getSelfHash();
+	uint8_t difficulty = currentIndex; // difficulty = currentIndex for simplicity
+	std::string previousHash = chain[currentIndex - 1].getHash();
 	Block block(currentIndex, transactionVector, 0, previousHash);
 	proofOfWork(block, difficulty);
 	if (block.validateNonce(difficulty))
 		chain.push_back(block);
 	else
-		std::cout << "error mining block";
+		std::cout << "Nonce not found";
 }
 
 int BlockChain::proofOfWork(Block &block, uint8_t difficulty)
@@ -32,7 +31,7 @@ int BlockChain::proofOfWork(Block &block, uint8_t difficulty)
 	for (uint64_t nonce = 0;; nonce++)
 	{
 		block.setNonce(nonce);
-		std::string hash = block.generateHash();
+		std::string hash = block.getHash();
 		for (uint8_t i = 0; i < difficulty; i++)
 		{
 			if (hash[i] != '0')
@@ -73,15 +72,12 @@ bool BlockChain::validateBlockChain()
 {
 	for (uint8_t i = 0; i < chain.size(); i++)
 	{
-		if (!chain[i].validateHash())
-			return false;
-
 		if (i != 0)
 		{
 			if (chain[i].validateNonce(i))
 				return false;
 
-			if (chain[i].getPreviousHash() != chain[i - 1].getSelfHash())
+			if (chain[i].getPreviousHash() != chain[i - 1].getHash())
 				return false;
 		}
 	}

@@ -4,20 +4,20 @@
 #include <iostream>
 #include <string>
 #include "Block.h"
-//#include "NodeServer.h"
+// #include "NodeServer.h"
 
 class BlockChain
 {
 private:
 	std::vector<Block> chain;
-	//NodeServer nodeServer;
+	// NodeServer nodeServer;
 
 public:
-	BlockChain();
+	BlockChain(const std::vector<Transaction> &genesisTr);
 	void mineBlock(const std::vector<Transaction> &transactionVector);
-	Block getGenesisBlock();
+	Block getGenesisBlock(const std::vector<Transaction> &genesisTr);
 	int proofOfWork(Block &block, uint8_t difficulty);
 	bool validateBlockChain();
 	void printBlockChain();
-	//void registerNode(const char *ip, int port);
+	// void registerNode(const char *ip, int port);
 };

@@ -5,11 +5,11 @@ class Output
 {
 private:
 	const uint64_t amount;
-	const std::string scriptPubKey;
+	const std::string pubKey;
 
 public:
-	Output(const uint64_t amount, const std::string &scriptPubKey);
+	Output(const uint64_t amount, const std::string &pubKey);
 	std::string getHash() const;
 	uint64_t getAmount() const;
-	std::string getScriptPubKey() const;
+	std::string getPubKey() const;
 };

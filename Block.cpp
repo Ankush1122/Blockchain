@@ -3,12 +3,6 @@
 Block::Block(const uint8_t currentIndex, const std::vector<Transaction> &transactionVector, const uint64_t nonce, const std::string &previousHash)
 	: currentIndex{currentIndex}, transactionVector{transactionVector}, nonce{nonce}, previousHash{previousHash}
 {
-	selfHash = generateHash();
-}
-
-bool Block::validateHash()
-{
-	return getSelfHash() == generateHash();
 }
 
 std::string generateTxVectorHash(const std::vector<Transaction> &transactionVector)
@@ -19,12 +13,6 @@ std::string generateTxVectorHash(const std::vector<Transaction> &transactionVect
 		hash += transactionVector[i].getTxHash();
 	}
 	return picosha2::hash256_hex_string(hash);
-}
-
-std::string Block::generateHash()
-{
-	std::string str = std::to_string(getCurrentIndex()) + generateTxVectorHash(transactionVector) + std::to_string(getNonce());
-	return picosha2::hash256_hex_string(str);
 }
 
 uint8_t Block::getCurrentIndex()
@@ -42,9 +30,11 @@ uint64_t Block::getNonce()
 	return nonce;
 }
 
-std::string Block::getSelfHash()
+std::string Block::getHash()
 {
-	return selfHash;
+
+	std::string str = std::to_string(getCurrentIndex()) + generateTxVectorHash(transactionVector) + std::to_string(getNonce());
+	return picosha2::hash256_hex_string(str);
 }
 
 std::string Block::getPreviousHash()
@@ -59,6 +49,7 @@ void Block::setNonce(uint64_t nonce)
 
 bool Block::validateNonce(uint8_t difficulty)
 {
+	std::string selfHash = this->getHash();
 	for (uint64_t i = 0; i < difficulty; i++)
 	{
 		if (selfHash[i] != '0')
